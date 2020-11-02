@@ -39,7 +39,7 @@ curl -F "file=@log.txt" https://file.io/?expires=2w > log_upload.json;
 log_link=$(jq -r '.link' log_upload.json)
 
 #Get Backup size
-backup_size=$(du -h /media/ubuntu/Backup/10.198.53.2/Backup/ | sort -rh | head -1 | cut -f1 -d "B")
+backup_size=$(du -h /media/ubuntu/Backup/10.198.53.2/Backup/ | sort -rh | head -1 | cut -f1 -d "/")
 
 #Prepare JSON file for email
 jq -n --arg start_time "$start_time" --arg end_time "$end_time" --arg log_link "$log_link" --arg backup_size "$backup_size" '{ "start_time": $start_time, "end_time": $end_time, "log_link": $log_link, "backup_size": $backup_size }' > email_details.json;
