@@ -19,7 +19,7 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-̦#Change directory for cronjob
+#Change directory for cronjob
 cd "$(dirname "$0")";
 
 #Get values
