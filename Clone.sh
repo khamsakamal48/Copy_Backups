@@ -34,9 +34,21 @@ end_time=$(date +%c)
 
 cp /media/ubuntu/Backup/10.198.53.2/log.txt log.txt;
 
-#Upload detailed log in File.io
-curl -F "file=@log.txt" https://file.io/?expires=2w > log_upload.json;
-log_link=$(jq -r '.link' log_upload.json)
+#Upload detailed log in Pastebin
+log=$(cat log.txt)
+key=$(cat api_key.txt)
+
+curl --request POST -sL \
+    --url 'https://pastebin.com/api/api_post.php' \
+    --data "api_dev_key=${key}" \
+    --data 'api_option=paste' \
+    --data "api_paste_code=${log}" \
+    --data 'api_paste_private=1' \
+    --data 'api_paste_format=prolog' \
+    --data 'api_paste_name=Log Summary' \
+    --data 'api_paste_expire_date=2W' > log_upload.txt;
+
+log_link=$(cat log_upload.txt)
 
 #Get Backup size
 backup_size=$(du -h /media/ubuntu/Backup/10.198.53.2/Backup/ | sort -rh | head -1 | cut -f1 -d "/")
