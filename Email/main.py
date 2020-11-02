@@ -45,7 +45,7 @@ service = discovery.build('gmail', 'v1', credentials=creds)
 
 import send_email
 
-recipient = "kamal.hamsa.91@gmail.com"
+recipient = "kamal.hamsa.91@gmail.com, amol.rathod@iitb.ac.in, dhananjay.satale@iitb.ac.in"
 subject = "Information regarding the Backup activity of Server at 10.198.53.2"
 
 body = open('Email.html')
