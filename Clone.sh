@@ -27,7 +27,7 @@ start_time=$(date +%c)
 
 #Mirror Backup
 rm -rf /media/ubuntu/Backup/10.198.53.2/log.txt;
-sshpass -f cred.txt rsync -aqzh --stats --log-file=/media/ubuntu/Backup/10.198.53.2/log.txt KamalH@10.198.53.2:/cygdrive/e/IITBApplication/Backup/ /media/ubuntu/Backup/10.198.53.2/Backup/ --progress;
+sshpass -f cred.txt rsync -aqzh --stats --log-file=/media/ubuntu/Backup/10.198.53.2/log.txt KamalH@10.198.53.2:/cygdrive/e/IITBApplication/Backup/ /media/ubuntu/Backup/10.198.53.2/Backup/;
 
 #Log Backup End time
 end_time=$(date +%c)
