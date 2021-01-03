@@ -45,7 +45,8 @@ curl --request POST -sL \
     --data 'api_paste_private=1' \
     --data 'api_paste_format=prolog' \
     --data 'api_paste_name=Log Summary' \
-    --data 'api_paste_expire_date=2W' > log_upload.txt;
+    --data 'api_paste_expire_date=2W'
+> log_upload.txt;
 
 log_link=$(cat log_upload.txt)
 
