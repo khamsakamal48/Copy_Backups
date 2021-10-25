@@ -37,6 +37,6 @@ sed -i "s|log_link|$log_link|g" Email.html;
 sed -i "s|backup_size|$backup_size|g" Email.html;
 
 #Let's send mail now
-python main.py;
+python3 send_email.py;
 sleep 2;
 rm -rf email_details.json;
