@@ -1,78 +1,52 @@
-from __future__ import print_function
-import httplib2
-import os
+import smtplib, ssl, json, time, imaplib
 
-from googleapiclient import discovery
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
-
-import base64
 from email.mime.text import MIMEText
-from email.mime.audio import MIMEAudio
-from email.mime.image import MIMEImage
-from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
-import mimetypes
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
 
-class send_email:
-    def __init__(self,service):
-        self.service = service
-    def create_message(self,sender, to, subject, message_text):
-      message = MIMEText(message_text, 'html')
-      message['to'] = to
-      message['from'] = sender
-      message['subject'] = subject
-      return {'raw': base64.urlsafe_b64encode(message.as_string())}
+recipient = "amol.rathod@acriitb.ac.in"
+cc = "dhananjay.satale@acr.iitb.ac.in"
+subject = "Information regarding the Backup activity of Server at 10.198.53.2"
 
-    def create_message_with_attachment(self,
-        sender, to, subject, message_text, file):
-      message = MIMEMultipart()
-      message['to'] = to
-      message['from'] = sender
-      message['subject'] = subject
+# Read server setting and credentials of email account from credentials.json
+with open('credentials.json') as f:
+  cred = json.load(f)
+  sender_email = cred["from"]
+  imap_address = cred["imap_server"]
+  smtp_address = cred["smtp_server"]
+  i_port = cred["imap_port"]
+  o_port = cred["smtp_port"]
+  login = cred["username"]
+  password = cred["password"]
+  reply_to = cred["reply_to"]
 
-      msg = MIMEText(message_text)
-      message.attach(msg)
+message = MIMEMultipart("alternative")
+message["Subject"] = subject
+message["From"] = sender_email
+message["To"] = recipient
+message["Cc"] = cc
 
-      content_type, encoding = mimetypes.guess_type(file)
+# Adding Reply-to header
+message.add_header('reply-to', reply_to)
 
-      if content_type is None or encoding is not None:
-        content_type = 'application/octet-stream'
-      main_type, sub_type = content_type.split('/', 1)
-      if main_type == 'text':
-        fp = open(file, 'rb')
-        msg = MIMEText(fp.read(), _subtype=sub_type)
-        fp.close()
-      elif main_type == 'image':
-        fp = open(file, 'rb')
-        msg = MIMEImage(fp.read(), _subtype=sub_type)
-        fp.close()
-      elif main_type == 'audio':
-        fp = open(file, 'rb')
-        msg = MIMEAudio(fp.read(), _subtype=sub_type)
-        fp.close()
-      else:
-        fp = open(file, 'rb')
-        msg = MIMEBase(main_type, sub_type)
-        msg.set_payload(fp.read())
-        fp.close()
-      filename = os.path.basename(file)
-      msg.add_header('Content-Disposition', 'attachment', filename=filename)
-      message.attach(msg)
+body = open('Email.html')
+html_email = body.read()
+# Turn these into html MIMEText objects
+emailbody = MIMEText(html_email, "html")
+# Add HTML parts to MIMEMultipart message
+# The email client will try to render the last part first
+message.attach(emailbody)
+emailcontent = message.as_string()
 
-      return {'raw': base64.urlsafe_b64encode(message.as_string()).decode()}
+# Create secure connection with server and send email
+context = ssl.create_default_context()
+with smtplib.SMTP_SSL(smtp_address, o_port, context=context) as server:
+    server.login(login, password)
+    server.sendmail(
+        sender_email, sender_email,  emailcontent
+    )
 
-    def send_message(self, user_id, message):
-      try:
-        message = (self.service.users().messages().send(userId=user_id, body=message)
-                   .execute())
-        print('Message Id: %s' % message['id'])
-        return message
-      except errors.HttpError as error:
-        print('An error occurred: %s' % error)
+# Save copy of the sent email to sent items folder
+with imaplib.IMAP4_SSL(imap_address, i_port) as imap:
+    imap.login(login, password)
+    imap.append('Sent', '\\Seen', imaplib.Time2Internaldate(time.time()), emailcontent.encode('utf8'))
+    imap.logout()
