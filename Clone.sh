@@ -26,12 +26,12 @@ cd "$(dirname "$0")";
 start_time=$(date +%c)
 
 #Mirror Backup
-sshpass -f cred.txt rsync -avzh --stats KamalH@10.198.53.2:/cygdrive/e/IITBApplication/Backup/ /mnt/f1da210e-6a0d-4bd2-95e6-f79f3e37af55/10.198.53.2/Backup/ | sed '0,/^$/d' > /mnt/f1da210e-6a0d-4bd2-95e6-f79f3e37af55/10.198.53.2/log.txt;
+sshpass -f cred.txt rsync -avzh --stats KamalH@10.198.53.2:/cygdrive/e/IITBApplication/Backup/ /media/ubuntu/Amol\ Backup/10.198.53.2/Backup/ | sed '0,/^$/d' > /media/ubuntu/Amol\ Backup/10.198.53.2/log.txt;
 
 #Log Backup End time
 end_time=$(date +%c)
 
-cp /mnt/f1da210e-6a0d-4bd2-95e6-f79f3e37af55/10.198.53.2/log.txt log.txt;
+cp /media/ubuntu/Amol\ Backup/10.198.53.2/log.txt log.txt;
 
 #Upload detailed log in Pastebin
 log=$(cat log.txt)
@@ -51,7 +51,7 @@ curl --request POST -sL \
 log_link=$(cat log_upload.txt)
 
 #Get Backup size
-backup_size=$(du -h /mnt/f1da210e-6a0d-4bd2-95e6-f79f3e37af55/10.198.53.2/Backup/ | sort -rh | head -1 | cut -f1 -d "/" | sed 's/[[:blank:]]//g')
+backup_size=$(du -h /media/ubuntu/Amol\ Backup/10.198.53.2/Backup/ | sort -rh | head -1 | cut -f1 -d "/" | sed 's/[[:blank:]]//g')
 
 #Prepare JSON file for email
 jq -n --arg start_time "$start_time" --arg end_time "$end_time" --arg log_link "$log_link" --arg backup_size "$backup_size" '{ "start_time": $start_time, "end_time": $end_time, "log_link": $log_link, "backup_size": $backup_size }' > email_details.json;
